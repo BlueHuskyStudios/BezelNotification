@@ -5,6 +5,11 @@ You know those dark, vibrant square notifications macOS does when you change the
 <img src="https://i.imgur.com/zwIa2K4.png" width="705" />
 
 
+## Try it out! ##
+
+To try out BHBezelNotification without instaling it into your own project first, you can use [this demo app we put together](https://github.com/BenLeggiero/BHBezelNotification-Demo-App)!
+
+
 ## Usage ##
 
 This is designed to strike a balance between ease-of-use and customizability. For instance, this is the primary way it is intended to be used in the general case:
