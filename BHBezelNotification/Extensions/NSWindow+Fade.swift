@@ -1,8 +1,9 @@
 //
 //  NSWindow+Fade.swift
-//  BH Bezel
+//  BH Bezel Notification
 //
 //  Created by Ben Leggiero on 2017-11-09.
+//  Translated to Swift 4 from the original (ObjC): https://gist.github.com/indragiek/1397050
 //  Copyright © 2017 Ben Leggiero. All rights reserved.
 //
 
@@ -14,20 +15,30 @@ private let defaultWindowAnimationDuration: TimeInterval = 0.25
 
 
 
-extension NSWindow {
+public extension NSWindow {
     
+    /// Called when an animation completes
     typealias AnimationCompletionHandler = () -> Void
     
     
     
-    enum DisplaySelector {
+    /// Represents a function called to make a window be presented
+    public enum PresentationFunction {
+        /// Calls `NSWindow.makeKey()`
         case makeKey
+        
+        /// Calls `NSWindow.makeKeyAndOrderFront(_:)`
         case makeKeyAndOrderFront
+        
+        /// Calls `NSWindow.orderFront(_:)`
         case orderFront
+        
+        /// Calls `NSWindow.orderFrontRegardless()`
         case orderFrontRegardless
         
         
-        func run(on window: NSWindow, sender: Any?) {
+        /// Runs the function represented by this case on the given window, passing the given selector if needed
+        public func run(on window: NSWindow, sender: Any?) {
             switch self {
             case .makeKey: window.makeKey()
             case .makeKeyAndOrderFront: window.makeKeyAndOrderFront(sender)
@@ -39,13 +50,20 @@ extension NSWindow {
     
     
     
-    enum CloseSelector {
+    /// Represents a function called to make a window be closed
+    public enum CloseFunction {
+        /// Calls `NSWindow.orderOut(_:)`
         case orderOut
+        
+        /// Calls `NSWindow.close()`
         case close
+        
+        /// Calls `NSWindow.performClose()`
         case performClose
         
         
-        func run(on window: NSWindow, sender: Any?) {
+        /// Runs the function represented by this case on the given window, passing the given selector if needed
+        public func run(on window: NSWindow, sender: Any?) {
             switch self {
             case .orderOut: window.orderOut(sender)
             case .close: window.close()
@@ -56,22 +74,34 @@ extension NSWindow {
     
     
     
-    @IBAction func fadeIn(_ sender: Any?) {
+    /// Fades this window in using the default values. Useful for NIB-style actions
+    @IBAction
+    public func fadeIn(_ sender: Any?) {
         self.fadeIn(sender: sender, duration: defaultWindowAnimationDuration)
     }
     
     
-    func fadeIn(sender: Any?,
-                duration: TimeInterval,
-                timingFunction: CAMediaTimingFunction? = .init(name: kCAMediaTimingFunctionEaseInEaseOut),
-                startingAlpha: CGFloat = 0,
-                targetAlpha: CGFloat = 1,
-                displaySelector: DisplaySelector = .makeKeyAndOrderFront,
-                completionHandler: AnimationCompletionHandler? = nil) {
+    /// Fades this window in using the given configuration
+    ///
+    /// - Parameters:
+    ///   - sender:               The message's sender, if any
+    ///   - duration:             The minimum amount of time it should to fade the window in
+    ///   - timingFunction:       The timing function of the animation
+    ///   - startingAlpha:        The alpha value at the start of the animation
+    ///   - targetAlpha:          The alpha value at the end of the animation
+    ///   - presentationFunction: The function to use when initially presenting the window
+    ///   - completionHandler:    Called when the animation completes
+    public func fadeIn(sender: Any?,
+                       duration: TimeInterval,
+                       timingFunction: CAMediaTimingFunction? = .default,
+                       startingAlpha: CGFloat = 0,
+                       targetAlpha: CGFloat = 1,
+                       presentationFunction: PresentationFunction = .makeKeyAndOrderFront,
+                       completionHandler: AnimationCompletionHandler? = nil) {
         
         alphaValue = startingAlpha
         
-        displaySelector.run(on: self, sender: sender)
+        presentationFunction.run(on: self, sender: sender)
         
         NSAnimationContext.runAnimationGroup({ context in
             context.duration = duration
@@ -81,18 +111,33 @@ extension NSWindow {
     }
     
     
-    @IBAction func fadeOut(_ sender: Any?) {
+    /// Fades this window out using the default values. Useful for NIB-style actions
+    @IBAction
+    public func fadeOut(_ sender: Any?) {
         self.fadeOut(sender: sender, duration: defaultWindowAnimationDuration)
     }
     
     
-    func fadeOut(sender: Any?,
-                 duration: TimeInterval,
-                 timingFunction: CAMediaTimingFunction? = .init(name: kCAMediaTimingFunctionEaseInEaseOut),
-                 targetAlpha: CGFloat = 0,
-                 resetAlphaAfterAnimation: Bool = true,
-                 closeSelector: CloseSelector = .orderOut,
-                 completionHandler: AnimationCompletionHandler? = nil) {
+    /// Fades this window out using the given configuration
+    ///
+    /// - Note: Unlike `fadeIn`, this does not take a starting alpha value. This is because the window's current
+    ///         alpha is used. If you really want it to be different, simply change that immediately before calling
+    ///         this function.
+    ///
+    /// - Parameters:
+    ///   - sender:               The message's sender, if any
+    ///   - duration:             The minimum amount of time it should to fade the window out
+    ///   - timingFunction:       The timing function of the animation
+    ///   - targetAlpha:          The alpha value at the end of the animation
+    ///   - presentationFunction: The function to use when initially presenting the window
+    ///   - completionHandler:    Called when the animation completes
+    public func fadeOut(sender: Any?,
+                        duration: TimeInterval,
+                        timingFunction: CAMediaTimingFunction? = .default,
+                        targetAlpha: CGFloat = 0,
+                        resetAlphaAfterAnimation: Bool = true,
+                        closeSelector: CloseFunction = .orderOut,
+                        completionHandler: AnimationCompletionHandler? = nil) {
         
         let startingAlpha = self.alphaValue
         
@@ -114,4 +159,14 @@ extension NSWindow {
             completionHandler?()
         })
     }
+}
+
+
+
+public extension CAMediaTimingFunction {
+    public static let easeIn = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+    public static let easeOut = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseOut)
+    public static let easenInEaseOut = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
+    public static let linear = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+    public static let `default` = CAMediaTimingFunction(name: kCAMediaTimingFunctionDefault)
 }

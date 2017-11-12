@@ -10,7 +10,7 @@
 		8438056A1FB6A66B00AE873E /* BHBezelNotification.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843805601FB6A66B00AE873E /* BHBezelNotification.framework */; };
 		8438056F1FB6A66B00AE873E /* BHBezelNotificationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438056E1FB6A66B00AE873E /* BHBezelNotificationTests.swift */; };
 		843805711FB6A66B00AE873E /* BHBezelNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 843805631FB6A66B00AE873E /* BHBezelNotification.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8438057B1FB6A68E00AE873E /* BHBezel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438057A1FB6A68E00AE873E /* BHBezel.swift */; };
+		8438057B1FB6A68E00AE873E /* BHBezelNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438057A1FB6A68E00AE873E /* BHBezelNotification.swift */; };
 		843805841FB6A77B00AE873E /* Array Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438057D1FB6A77B00AE873E /* Array Extensions.swift */; };
 		843805851FB6A77B00AE873E /* CGContext Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438057E1FB6A77B00AE873E /* CGContext Extensions.swift */; };
 		843805861FB6A77B00AE873E /* CGPath Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8438057F1FB6A77B00AE873E /* CGPath Extensions.swift */; };
@@ -37,7 +37,7 @@
 		843805691FB6A66B00AE873E /* BHBezelNotificationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BHBezelNotificationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		8438056E1FB6A66B00AE873E /* BHBezelNotificationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BHBezelNotificationTests.swift; sourceTree = "<group>"; };
 		843805701FB6A66B00AE873E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8438057A1FB6A68E00AE873E /* BHBezel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BHBezel.swift; sourceTree = "<group>"; };
+		8438057A1FB6A68E00AE873E /* BHBezelNotification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BHBezelNotification.swift; sourceTree = "<group>"; };
 		8438057D1FB6A77B00AE873E /* Array Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array Extensions.swift"; sourceTree = "<group>"; };
 		8438057E1FB6A77B00AE873E /* CGContext Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGContext Extensions.swift"; sourceTree = "<group>"; };
 		8438057F1FB6A77B00AE873E /* CGPath Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPath Extensions.swift"; sourceTree = "<group>"; };
@@ -88,7 +88,7 @@
 			isa = PBXGroup;
 			children = (
 				8438057C1FB6A77B00AE873E /* Extensions */,
-				8438057A1FB6A68E00AE873E /* BHBezel.swift */,
+				8438057A1FB6A68E00AE873E /* BHBezelNotification.swift */,
 				843805631FB6A66B00AE873E /* BHBezelNotification.h */,
 				843805641FB6A66B00AE873E /* Info.plist */,
 			);
@@ -232,7 +232,7 @@
 				843805841FB6A77B00AE873E /* Array Extensions.swift in Sources */,
 				843805861FB6A77B00AE873E /* CGPath Extensions.swift in Sources */,
 				8438058A1FB6A77B00AE873E /* NSWindow+Fade.swift in Sources */,
-				8438057B1FB6A68E00AE873E /* BHBezel.swift in Sources */,
+				8438057B1FB6A68E00AE873E /* BHBezelNotification.swift in Sources */,
 				843805881FB6A77B00AE873E /* NSImage Extensions.swift in Sources */,
 				843805851FB6A77B00AE873E /* CGContext Extensions.swift in Sources */,
 				843805871FB6A77B00AE873E /* NSFont Extensions.swift in Sources */,

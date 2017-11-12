@@ -1,6 +1,6 @@
 //
-//  BHBezel.swift
-//  BH Bezel
+//  BHBezelNotification.swift
+//  BH Bezel Notification
 //
 //  Created by Ben Leggiero on 2017-11-09.
 //  Copyright © 2017 Ben Leggiero. All rights reserved.
@@ -10,13 +10,16 @@ import Cocoa
 
 
 
+/// The style mask used on all bezel windows
 private let bezelStyleMask: NSWindow.StyleMask = [.borderless]
 
+/// All currently-showing bezel windows
 private var bezelWindows = Set<BHBezelWindow>()
 
 
 
-public struct BHBezel {
+/// The intended public interface for showing a notification bezel
+public struct BHNotificationBezel {
     
     public typealias AfterHideCallback = () -> Void
     
@@ -74,7 +77,8 @@ public struct BHBezel {
     /// See `BHBezelParameters` for documentation of each parameter.
     ///
     /// If you want to manually dismiss th enotification, rather than trusting the time to live, you can give a very
-    /// large nubmer for `timeToLive` and call the resulting delegate's `donePresentingBezel()` function.
+    /// large nubmer for `timeToLive` (e.g. `.infinity`) and call the resulting delegate's `donePresentingBezel()`
+    /// function.
     ///
     /// - Returns: A delegate that allows control of the bezel after it's shown
     /// - SeeAlso: BHBezelParameters
@@ -93,11 +97,13 @@ public struct BHBezel {
             weak var bezelWindow: BHBezelWindow?
             let afterHideCallback: AfterHideCallback
             
+            
             init(bezelWindow: BHBezelWindow,
                  afterHideCallback: @escaping AfterHideCallback) {
                 self.bezelWindow = bezelWindow
                 self.afterHideCallback = afterHideCallback
             }
+            
             
             func donePresentingBezel() {
                 guard
@@ -124,7 +130,7 @@ public struct BHBezel {
         
         bezelWindow.fadeIn(sender: nil,
                            duration: parameters.fadeInAnimationDuration,
-                           displaySelector: .orderFrontRegardless)
+                           presentationFunction: .orderFrontRegardless)
         
         Timer.scheduledTimer(withTimeInterval: parameters.timeToLive.inSeconds, repeats: false) { _ in
             delegate.donePresentingBezel()
@@ -136,6 +142,7 @@ public struct BHBezel {
 
 
 
+/// Use this to interact with a bezel after it's been shown
 public protocol BezelDelegate : AnyObject {
     /// Called when the bezel is done and should be faded out, closed, and destroyed.
     /// This is useful for hiding it early or manually.
@@ -144,6 +151,7 @@ public protocol BezelDelegate : AnyObject {
 
 
 
+/// A set of parameters used to configure and present a bezel notification
 public struct BezelParameters {
     
     public static let defaultLocation: BezelLocation = .normal
@@ -210,20 +218,20 @@ public struct BezelParameters {
     
     
     public init(messageText: String,
-         icon: NSImage? = nil,
-         
-         location: BezelLocation = defaultLocation,
-         size: BezelSize = defaultSize,
-         timeToLive: BezelTimeToLive = defaultTimeToLive,
-         
-         fadeInAnimationDuration: TimeInterval = defaultFadeInAnimationDuration,
-         fadeOutAnimationDuration: TimeInterval = defaultFadeOutAnimationDuration,
-         
-         cornerRadius: CGFloat = defaultCornerRadius,
-         backgroundTint: NSColor = defaultBackgroundTint,
-         messageLabelBaselineOffsetFromBottomOfBezel: CGFloat = defaultMessageLabelBaselineOffsetFromBottomOfBezel,
-         messageLabelFont: NSFont = defaultMessageLabelFont,
-         messageLabelColor: NSColor = defaultMessageLabelColor
+                icon: NSImage? = nil,
+                
+                location: BezelLocation = defaultLocation,
+                size: BezelSize = defaultSize,
+                timeToLive: BezelTimeToLive = defaultTimeToLive,
+                
+                fadeInAnimationDuration: TimeInterval = defaultFadeInAnimationDuration,
+                fadeOutAnimationDuration: TimeInterval = defaultFadeOutAnimationDuration,
+                
+                cornerRadius: CGFloat = defaultCornerRadius,
+                backgroundTint: NSColor = defaultBackgroundTint,
+                messageLabelBaselineOffsetFromBottomOfBezel: CGFloat = defaultMessageLabelBaselineOffsetFromBottomOfBezel,
+                messageLabelFont: NSFont = defaultMessageLabelFont,
+                messageLabelColor: NSColor = defaultMessageLabelColor
         ) {
         self.messageText = messageText
         self.icon = icon
@@ -245,6 +253,7 @@ public struct BezelParameters {
 
 
 
+/// How long a bezel notification should stay on screen
 public enum BezelTimeToLive {
     /// Bezel is shown for just a couple seconds
     case short
@@ -271,14 +280,9 @@ public enum BezelTimeToLive {
 
 
 
+/// The window used to present a bezel notification.
+/// If you _really_ need minute control, you may use this.
 public class BHBezelWindow : NSWindow {
-    
-//    lazy var messageTextLabel: NSTextField = {
-//        let messageTextLabel = NSTextField(labelWithString: self.messageText)
-//        messageTextLabel.font = NSFont.systemFont(ofSize: self.labelFontSize, weight: NSFont.Weight.regular)
-//        messageTextLabel.wantsLayer = true
-//        return messageTextLabel
-//    }()
     
     private lazy var bezelContentView: BHBezelContentView = {
         let bezelContentView = BHBezelContentView(parameters: self.parameters)
@@ -288,20 +292,13 @@ public class BHBezelWindow : NSWindow {
     }()
     
     var messageText: String { return parameters.messageText }
+    
     fileprivate let parameters: BezelParameters
     
-//    var labelBaselineOffsetFromBottomOfBezel: CGFloat { return parameters.messageLabelBaselineOffsetFromBottomOfBezel }
-//    let labelFontSize: CGFloat { return parameters.messageLabelFont.pointSize }
     
-//    public override var contentView: NSView? {
-//        willSet {
-//            newValue?.wantsLayer = true
-//            newValue?.layer?.cornerRadius = parameters.cornerRadius
-//            newValue?.layer?.masksToBounds = true
-//        }
-//    }
-    
-    
+    /// Creates a new bezel window with the given parameters
+    ///
+    /// - Parameter parameters: Those parameters that dictate how this window appears
     public init(parameters: BezelParameters) {
         
         self.parameters = parameters
@@ -368,22 +365,24 @@ public class BHBezelWindow : NSWindow {
 
 
 
-private class BHBezelContentView: NSView {
+/// The view powering the `BHBezelWindow`'s appearance.
+/// If you _really, really_ need _extreme_ control, you may use this. Don't, though, if you can avoid it.
+public class BHBezelContentView: NSView {
     
     let parameters: BezelParameters
     
-    override var allowsVibrancy: Bool { return true }
+    override public var allowsVibrancy: Bool { return true }
     
-    init(parameters: BezelParameters) {
+    public init(parameters: BezelParameters) {
         self.parameters = parameters
         super.init(frame: NSRect(origin: .zero, size: parameters.size.cgSize))
     }
     
-    required init?(coder: NSCoder) {
+    required public init?(coder: NSCoder) {
         fatalError("init(coder:) not implemented")
     }
     
-    override func draw(_ dirtyRect: NSRect) {
+    override public func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
         
         guard let context = NSGraphicsContext.current?.cgContext else {
@@ -427,10 +426,10 @@ private class BHBezelContentView: NSView {
 
 
 
-fileprivate extension String {
-    fileprivate func findBezelLabelBoundingBox(within parentBounds: NSRect,
-                                               offsetFromBottom: CGFloat,
-                                               font: NSFont) -> NSRect {
+private extension String {
+    func findBezelLabelBoundingBox(within parentBounds: NSRect,
+                                   offsetFromBottom: CGFloat,
+                                   font: NSFont) -> NSRect {
         let attributedString = NSAttributedString(string: self, attributes: [.font : font])
         let textBounds = attributedString.boundingRect(with: parentBounds.size, options: [])
         let textBaselineY = offsetFromBottom
@@ -439,15 +438,16 @@ fileprivate extension String {
     }
     
     
-    fileprivate func findBezelLabelTextStartPoint(within parentBounds: NSRect,
-                                                  offsetFromBottom: CGFloat,
-                                                  font: NSFont) -> NSPoint {
+    func findBezelLabelTextStartPoint(within parentBounds: NSRect,
+                                      offsetFromBottom: CGFloat,
+                                      font: NSFont) -> NSPoint {
         return findBezelLabelBoundingBox(within: parentBounds, offsetFromBottom: offsetFromBottom, font: font).origin
     }
 }
 
 
 
+/// The semantic size of a bezel notification
 public enum BezelSize {
     case normal
 }
@@ -473,6 +473,7 @@ extension BezelSize {
 
 
 
+/// The semantic location of a bezel notification
 public enum BezelLocation {
     case normal
 }
@@ -495,11 +496,11 @@ extension BezelLocation {
 
 
 
-public extension NSScreen {
+private extension NSScreen {
     
     private static let lowerCenterRectBottomOffset: CGFloat = 140
     
-    public func lowerCenterRect(ofSize size: NSSize) -> NSRect {
+    func lowerCenterRect(ofSize size: NSSize) -> NSRect {
         return NSRect(origin: NSPoint(x: self.frame.midX - (size.width / 2),
                                       y: self.frame.minY + NSScreen.lowerCenterRectBottomOffset),
                       size: size)
