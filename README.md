@@ -4,6 +4,8 @@ You know those dark, vibrant square notifications macOS does when you change the
 
 <img src="https://i.imgur.com/zwIa2K4.png" width="705" />
 
+That this does _not_ call system APIs, so this cannot interact with nor affect system bezel notifications.
+
 
 ## Try it out! ##
 
