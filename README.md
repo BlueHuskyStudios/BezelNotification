@@ -4,7 +4,7 @@ You know those dark, vibrant square notifications macOS does when you change the
 
 <img src="https://i.imgur.com/zwIa2K4.png" width="705" />
 
-That this does _not_ call system APIs, so this cannot interact with nor affect system bezel notifications.
+Note that this does _not_ use any secret system APIs (but instead creates its own bezel notifications from scratch), so this cannot interact with nor affect system bezel notifications.
 
 
 ## Try it out! ##
@@ -17,7 +17,7 @@ To try out BHBezelNotification without instaling it into your own project first,
 This is designed to strike a balance between ease-of-use and customizability. For instance, this is the primary way it is intended to be used in the general case:
 
 ```Swift
-BHBezelNotification.show(message: "Loading...", icon: .myLoadingIcon)
+BHBezelNotification.show(messageText: "Loading...", icon: .myLoadingIcon)
 ```
 
 
@@ -35,7 +35,7 @@ BHBezelNotification.show(messageText: "Loading...",
                          fadeOutAnimationDuration: 1,
 
                          cornerRadius: 10,
-                         tint: NSColor = BezelParameters.defaultBackgroundTint,
+                         tint: BezelParameters.defaultBackgroundTint,
                          messageLabelFont: NSFont(name: "American Typewriter", size: 20)!,
                          messageLabelColor: .magenta,
 
