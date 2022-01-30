@@ -1,0 +1,25 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "CrossKitTypes",
+        "repositoryURL": "https://github.com/RougeWare/Swift-Cross-Kit-Types.git",
+        "state": {
+          "branch": null,
+          "revision": "d64faa8d5e988352dff45e03a13da4f90c3a70e5",
+          "version": "1.0.0"
+        }
+      },
+      {
+        "package": "FunctionTools",
+        "repositoryURL": "https://github.com/RougeWare/Swift-Function-Tools.git",
+        "state": {
+          "branch": null,
+          "revision": "0bd76ca2c00120acf7ff840b5dcc1e700870ae22",
+          "version": "1.2.3"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

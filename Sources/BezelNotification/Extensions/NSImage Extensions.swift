@@ -7,13 +7,16 @@
 //
 
 import Foundation
+import AppKit
+
+import CrossKitTypes
 
 
 
-public extension NSImage {
-    public static func roundedRectMask(size: NSSize, cornerRadius: CGFloat) -> NSImage {
+internal extension NativeImage {
+    static func roundedRectMask(size: NSSize, cornerRadius: CGFloat) -> NativeImage {
 
-        let maskImage = NSImage(size: size, flipped: false) { rect in
+        let maskImage = NativeImage(size: size, flipped: false) { rect in
             let bezierPath = NSBezierPath(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
             NSColor.black.set()
             bezierPath.fill()

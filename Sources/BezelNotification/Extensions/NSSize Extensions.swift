@@ -8,29 +8,26 @@
 
 import Foundation
 
+import AppKit
 
 
-extension NSSize {
+
+internal extension CGSize {
     
-    init(copyOf original: NSSize) {
-        self.init(width: original.width, height: original.height)
-    }
-    
-    
-    init(scaling original: NSSize, toFitWithin parent: NSSize, approach: NSImageScaling) {
+    init(scaling original: CGSize, toFitWithin parent: CGSize, approach: NSImageScaling) {
         
         switch approach {
         case .scaleAxesIndependently:
-            self.init(copyOf: parent)
+            self = parent
             
         case .scaleNone:
-            self.init(copyOf: original)
+            self = original
             
         case .scaleProportionallyDown:
             // If it already fits, no need to scale. Just use the original.
             if original.height < parent.height
                 && original.width < parent.width {
-                self.init(copyOf: original)
+                self = original
             }
             else {
                 fallthrough
@@ -48,18 +45,21 @@ extension NSSize {
             else {
                 self.init(scaling: original, proportionallyToFitWidth: parent.width)
             }
+            
+        @unknown default:
+            self = original
         }
     }
     
     
-    init(scaling original: NSSize, proportionallyToFitHeight newHeight: CGFloat) {
+    init(scaling original: CGSize, proportionallyToFitHeight newHeight: CGFloat) {
         let percentChange = newHeight / original.height
         self.init(width: original.width * percentChange,
                   height: newHeight)
     }
     
     
-    init(scaling original: NSSize, proportionallyToFitWidth newWidth: CGFloat) {
+    init(scaling original: CGSize, proportionallyToFitWidth newWidth: CGFloat) {
         let percentChange = newWidth / original.width
         self.init(width: newWidth,
                   height: original.height * percentChange)
@@ -73,31 +73,31 @@ extension NSSize {
 
 
 
-public extension NSSize {
-    public static func *(lhs: Double, rhs: NSSize) -> NSSize {
+internal extension CGSize {
+    static func *(lhs: Double, rhs: CGSize) -> CGSize {
         return CGFloat(lhs) * rhs
     }
     
     
-    public static func *(lhs: NSSize, rhs: Double) -> NSSize {
+    static func *(lhs: CGSize, rhs: Double) -> CGSize {
         return lhs * CGFloat(rhs)
     }
     
     
-    public static func *(lhs: CGFloat, rhs: NSSize) -> NSSize {
-        return NSSize(width: lhs * rhs.width,
+    static func *(lhs: CGFloat, rhs: CGSize) -> CGSize {
+        return CGSize(width: lhs * rhs.width,
                       height: lhs * rhs.height)
     }
     
     
-    public static func *(lhs: NSSize, rhs: CGFloat) -> NSSize {
-        return NSSize(width: lhs.width * rhs,
+    static func *(lhs: CGSize, rhs: CGFloat) -> CGSize {
+        return CGSize(width: lhs.width * rhs,
                       height: lhs.height * rhs)
     }
     
     
-    public static func *(lhs: NSSize, rhs: NSSize) -> NSSize {
-        return NSSize(width: lhs.width * rhs.width,
+    static func *(lhs: CGSize, rhs: CGSize) -> CGSize {
+        return CGSize(width: lhs.width * rhs.width,
                       height: lhs.height * rhs.height)
     }
 }
