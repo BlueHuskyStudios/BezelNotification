@@ -9,7 +9,7 @@ Note that this does _not_ use any secret system APIs (but instead creates its ow
 
 ## Try it out! ##
 
-To try out BezelNotification without instaling it into your own project first, you can use [this demo app I put together](https://github.com/BenLeggiero/BHBezelNotification-Demo-App)!
+To try out BezelNotification without instaling it into your own project first, you can use [this demo app I put together](https://github.com/KyLeggiero/BezelNotification-Demo-App)!
 
 
 ## Usage ##

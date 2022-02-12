@@ -7,7 +7,7 @@ let package = Package(
     name: "BezelNotification",
     
     platforms: [
-        .macOS(.v10_12),
+        .macOS(.v10_15),
     ],
     
     products: [
