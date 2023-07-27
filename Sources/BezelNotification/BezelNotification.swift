@@ -32,16 +32,16 @@ public enum BezelNotification {
 
 public extension BezelNotification {
     
-    typealias AfterHideCallback = BlindCallback
-    
     /// Shows a BHBezel notification using the given parameters.
-    /// See `BHBezelParameters` for documentation of each parameter.
+    /// See ``BezelNotification.Parameters`` for documentation of each parameter.
     ///
-    /// If you want to manually dismiss th enotification, rather than trusting the time to live, you can give a very
-    /// large nubmer for `timeToLive` and call the resulting delegate's `donePresentingBezel()` function.
+    /// If you want to manually dismiss the notification, rather than trusting the time to live, you can give `.forever` for `timeToLive` and cancel or deallocate the resulting publisher when you're ready to dismiss it.
     ///
-    /// - Returns: A delegate that allows control of the bezel after it's shown
-    /// - SeeAlso: BezelNotification.Parameters
+    /// - Returns: A publisher that allows you to react to the bezel appearing & disappearing.
+    ///            **You must retain this in order for the notification to show!**
+    ///            To hide the notification manually, simply cancel or deallocate it.
+    ///
+    /// - SeeAlso: ``BezelNotification.Parameters``
     @discardableResult
     static func show(messageText: String,
                      icon: NativeImage? = nil,
@@ -56,72 +56,81 @@ public extension BezelNotification {
                      cornerRadius: CGFloat = Parameters.defaultCornerRadius,
                      tint: NSColor = Parameters.defaultBackgroundTint,
                      messageLabelFont: NSFont = Parameters.defaultMessageLabelFont,
-                     messageLabelColor: NSColor = Parameters.defaultMessageLabelColor,
-                     
-                     afterHideCallback: @escaping AfterHideCallback = {}
-    ) -> LifecyclePublisher {
-        
-        return self.show(
-            with: Parameters(
-                messageText: messageText,
-                icon: icon,
-                
-                location: location,
-                size: size,
-                
-                timeToLive: timeToLive,
-                fadeInAnimationDuration: fadeInAnimationDuration,
-                fadeOutAnimationDuration: fadeOutAnimationDuration,
-                
-                //messageLabelBaselineOffsetFromBottomOfBezel: default,
-                cornerRadius: cornerRadius,
-                backgroundTint: tint,
-                messageLabelFont: messageLabelFont,
-                messageLabelColor: messageLabelColor
-            ),
+                     messageLabelColor: NSColor = Parameters.defaultMessageLabelColor
+    ) -> LifecyclePublisher
+    {
+        show(with: Parameters(
+            messageText: messageText,
+            icon: icon,
             
-            afterHideCallback: afterHideCallback)
+            location: location,
+            size: size,
+            
+            timeToLive: timeToLive,
+            fadeInAnimationDuration: fadeInAnimationDuration,
+            fadeOutAnimationDuration: fadeOutAnimationDuration,
+            
+            //messageLabelBaselineOffsetFromBottomOfBezel: default,
+            cornerRadius: cornerRadius,
+            backgroundTint: tint,
+            messageLabelFont: messageLabelFont,
+            messageLabelColor: messageLabelColor
+        ))
     }
     
     
-    /// Shows a BHBezel notification using the given parameters.
-    /// See `BHBezelParameters` for documentation of each parameter.
+    /// Shows a Bezel Notification using the given parameters.
+    /// See ``BezelNotification.Parameters`` for documentation of each parameter.
     ///
-    /// If you want to manually dismiss th enotification, rather than trusting the time to live, you can give a very
-    /// large nubmer for `timeToLive` (e.g. `.infinity`) and call the resulting delegate's `donePresentingBezel()`
-    /// function.
+    /// If you want to manually dismiss the notification, rather than trusting the time to live, you can give `.forever` for `timeToLive` and cancel or deallocate the resulting publisher when you're ready to dismiss it.
     ///
-    /// - Returns: A delegate that allows control of the bezel after it's shown
+    /// - Returns: A publisher that allows you to react to the bezel appearing & disappearing.
+    ///            **You must retain this in order for the notification to show!**
+    ///            To hide the notification manually, simply cancel or deallocate it.
+    ///
     /// - SeeAlso: ``BezelNotification.Parameters``
-    static func show(with parameters: Parameters,
-                     afterHideCallback: @escaping AfterHideCallback = null)
+    static func show(with parameters: Parameters)
     -> LifecyclePublisher
     {
         let publisher = CurrentValueSubject<LifecycleStage, Never>(.willAppear)
+        var _disappearNow: BlindCallback = null
+        
+        func disappearNow() { _disappearNow() } // this allows us to hot-swap the implementation even after sending it elsewhere
+        
         
         DispatchQueue.main.async {
+            
             let bezelWindow = Window(parameters: parameters)
             bezelWindows.insert(bezelWindow)
             
-            publisher.send(.appearing)
-            bezelWindow.fadeIn(duration: parameters.fadeInAnimationDuration,
-                               presentationFunction: .orderFrontRegardless)
-            {
-                publisher.send(.presented)
-            }
-            
-            Timer.scheduledTimer(withTimeInterval: parameters.timeToLive.inSeconds, repeats: false) { _ in
+            _disappearNow = {
+                _disappearNow = null
                 publisher.send(.disappearing)
                 bezelWindow.fadeOut(duration: bezelWindow.parameters.fadeOutAnimationDuration,
                                     closeSelector: .close)
                 {
                     bezelWindows.remove(bezelWindow)
                     publisher.send(.didDisappear)
+                    publisher.send(completion: .finished)
                 }
+            }
+            
+            
+            publisher.send(.appearing)
+            bezelWindow.fadeIn(duration: parameters.fadeInAnimationDuration,
+                               presentationFunction: .orderFrontRegardless)
+            {
+                publisher.send(.presented(disappearEarly: disappearNow))
+            }
+            
+            Timer.scheduledTimer(withTimeInterval: parameters.timeToLive.inSeconds, repeats: false) { _ in
+                disappearNow()
             }
         }
         
-        return publisher.eraseToAnyPublisher()
+        return publisher
+            .handleEvents(receiveCancel: disappearNow)
+            .eraseToAnyPublisher()
     }
 }
 
@@ -145,7 +154,8 @@ public extension BezelNotification {
         case appearing
         
         /// The bezel notification has finished its appearance animation and is statically on-screen
-        case presented
+        /// - Parameter disappearEarly: _optional_ - Call this to cause the bezel notification to disappear now rather than awaiting timeout
+        case presented(disappearEarly: BlindCallback = null)
         
         /// The bezel notification's disappearance animation is in-progress
         case disappearing
@@ -170,7 +180,7 @@ public extension BezelNotification {
         public static let defaultFadeOutAnimationDuration: TimeInterval = 0.25
         
         public static let defaultCornerRadius: CGFloat = 18
-        public static let defaultBackgroundTint = NSColor(calibratedWhite: 0, alpha: 1)
+        public static let defaultBackgroundTint = NSColor.clear
         public static let defaultMessageLabelBaselineOffsetFromBottomOfBezel: CGFloat = 20
         public static let defaultMessageLabelFontSize: CGFloat = 18
         public static let defaultMessageLabelFont = NSFont.systemFont(ofSize: defaultMessageLabelFontSize)
@@ -252,7 +262,7 @@ public extension BezelNotification {
             self.fadeOutAnimationDuration = fadeOutAnimationDuration
             
             self.cornerRadius = cornerRadius
-            self.backgroundTint = backgroundTint.withAlphaComponent(0.15)
+            self.backgroundTint = backgroundTint.withAlphaComponent(backgroundTint.alphaComponent * 0.15)
             self.messageLabelBaselineOffsetFromBottomOfBezel = messageLabelBaselineOffsetFromBottomOfBezel
             self.messageLabelFont = messageLabelFont
             self.messageLabelColor = messageLabelColor
@@ -325,11 +335,13 @@ public extension BezelNotification {
             self.maxSize = contentRect.size
             
             self.isReleasedWhenClosed = false
-            self.level = .dock
+            self.level = .screenSaver
             self.ignoresMouseEvents = true
             self.appearance = NSAppearance(named: .vibrantDark)
             self.isOpaque = false
             self.backgroundColor = .clear
+            self.tabbingMode = .disallowed
+            self.collectionBehavior = [.canJoinAllSpaces, .fullScreenNone, .ignoresCycle, .stationary]
             
             addComponents()
         }
@@ -350,13 +362,6 @@ public extension BezelNotification {
                 bezelContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
                 bezelContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             ])
-            
-            //        messageTextLabel.translatesAutoresizingMaskIntoConstraints = false
-            //        visualEffectView.addSubview(messageTextLabel)
-            //        NSLayoutConstraint.activate([
-            //            messageTextLabel.centerXAnchor.constraint(equalTo: visualEffectView.centerXAnchor),
-            //            messageTextLabel.lastBaselineAnchor.constraint(equalTo: visualEffectView.bottomAnchor, constant: -labelBaselineOffsetFromBottomOfBezel)
-            //        ])
         }
         
         
@@ -364,7 +369,7 @@ public extension BezelNotification {
             let visualEffectView = NSVisualEffectView()
             visualEffectView.wantsLayer = true
             visualEffectView.blendingMode = .behindWindow
-            visualEffectView.material = .dark
+            visualEffectView.material = .hudWindow
             visualEffectView.state = .active
             visualEffectView.maskImage = .roundedRectMask(size: self.parameters.size.cgSize,
                                                           cornerRadius: self.parameters.cornerRadius)
