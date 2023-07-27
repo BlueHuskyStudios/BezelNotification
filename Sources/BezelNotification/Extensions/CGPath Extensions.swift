@@ -10,8 +10,8 @@ import CoreGraphics
 
 
 
-extension CGPath {
-    public static func roundedRect(size: CGSize, cornerRadius: CGFloat) -> CGPath {
+internal extension CGPath {
+    static func roundedRect(size: CGSize, cornerRadius: CGFloat) -> CGPath {
         return CGPath(roundedRect: CGRect(origin: .zero, size: size),
                       cornerWidth: cornerRadius,
                       cornerHeight: cornerRadius,

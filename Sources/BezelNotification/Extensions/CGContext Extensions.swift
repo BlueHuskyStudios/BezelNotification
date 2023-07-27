@@ -8,10 +8,16 @@
 
 import Foundation
 
+import CrossKitTypes
+
 
 
 extension CGContext {
-    func draw(text string: String, at point: CGPoint, color: NSColor, font: NSFont = .systemFont(ofSize: NSFont.systemFontSize)) {
+    func draw(text string: String,
+              at point: CGPoint,
+              color: NativeColor,
+              font: NativeFont = .systemFont(ofSize: NativeFont.systemFontSize))
+    {
         (string as NSString).draw(at: point,
                                   withAttributes: [
                                     .foregroundColor : color,

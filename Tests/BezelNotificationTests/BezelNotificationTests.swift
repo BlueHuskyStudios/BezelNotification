@@ -1,6 +1,6 @@
 //
-//  BHBezelNotificationTests.swift
-//  BHBezelNotificationTests
+//  BezelNotificationTests.swift
+//  BezelNotificationTests
 //
 //  Created by Ben Leggiero on 2017-11-10.
 //  Copyright © 2017 Blue Husky Studios. All rights reserved.
@@ -9,7 +9,7 @@
 import XCTest
 @testable import BHBezelNotification
 
-class BHBezelNotificationTests: XCTestCase {
+class BezelNotificationTests: XCTestCase {
     
     override func setUp() {
         super.setUp()

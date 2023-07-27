@@ -8,6 +8,9 @@
 
 import Cocoa
 
+import CrossKitTypes
+import FunctionTools
+
 
 
 /// The style mask used on all bezel windows
@@ -18,10 +21,16 @@ private var bezelWindows = Set<BHBezelWindow>()
 
 
 
-/// The intended public interface for showing a notification bezel
-public struct BHNotificationBezel {
+/// The Cocoa-style public interface for showing a notification bezel
+public enum BezelNotification {
+    // Empty on-purpose; all members are static
+}
+
+
+
+public extension BezelNotification {
     
-    public typealias AfterHideCallback = () -> Void
+    typealias AfterHideCallback = BlindCallback
     
     /// Shows a BHBezel notification using the given parameters.
     /// See `BHBezelParameters` for documentation of each parameter.
@@ -32,23 +41,23 @@ public struct BHNotificationBezel {
     /// - Returns: A delegate that allows control of the bezel after it's shown
     /// - SeeAlso: BHBezelParameters
     @discardableResult
-    public static func show(messageText: String,
-                            icon: NSImage? = nil,
-                            
-                            location: BezelLocation = BezelParameters.defaultLocation,
-                            size: BezelSize = BezelParameters.defaultSize,
-                            
-                            timeToLive: BezelTimeToLive = BezelParameters.defaultTimeToLive,
-                            fadeInAnimationDuration: TimeInterval = BezelParameters.defaultFadeInAnimationDuration,
-                            fadeOutAnimationDuration: TimeInterval = BezelParameters.defaultFadeOutAnimationDuration,
-                            
-                            cornerRadius: CGFloat = BezelParameters.defaultCornerRadius,
-                            tint: NSColor = BezelParameters.defaultBackgroundTint,
-                            messageLabelFont: NSFont = BezelParameters.defaultMessageLabelFont,
-                            messageLabelColor: NSColor = BezelParameters.defaultMessageLabelColor,
-                            
-                            afterHideCallback: @escaping AfterHideCallback = {}
-        ) -> BezelDelegate {
+    static func show(messageText: String,
+                     icon: NativeImage? = nil,
+                     
+                     location: BezelLocation = BezelParameters.defaultLocation,
+                     size: BezelSize = BezelParameters.defaultSize,
+                     
+                     timeToLive: BezelTimeToLive = BezelParameters.defaultTimeToLive,
+                     fadeInAnimationDuration: TimeInterval = BezelParameters.defaultFadeInAnimationDuration,
+                     fadeOutAnimationDuration: TimeInterval = BezelParameters.defaultFadeOutAnimationDuration,
+                     
+                     cornerRadius: CGFloat = BezelParameters.defaultCornerRadius,
+                     tint: NSColor = BezelParameters.defaultBackgroundTint,
+                     messageLabelFont: NSFont = BezelParameters.defaultMessageLabelFont,
+                     messageLabelColor: NSColor = BezelParameters.defaultMessageLabelColor,
+                     
+                     afterHideCallback: @escaping AfterHideCallback = {}
+    ) -> BezelDelegate {
         
         return self.show(
             with: BezelParameters(
@@ -82,8 +91,8 @@ public struct BHNotificationBezel {
     ///
     /// - Returns: A delegate that allows control of the bezel after it's shown
     /// - SeeAlso: BHBezelParameters
-    public static func show(with parameters: BezelParameters,
-                            afterHideCallback: @escaping AfterHideCallback = {}
+    static func show(with parameters: BezelParameters,
+                     afterHideCallback: @escaping AfterHideCallback = {}
         ) -> BezelDelegate {
         
         let bezelWindow = BHBezelWindow(parameters: parameters)
@@ -139,6 +148,7 @@ public struct BHNotificationBezel {
         return delegate
     }
 }
+
 
 
 
@@ -451,23 +461,29 @@ private extension String {
 public enum BezelSize {
     case normal
 }
-extension BezelSize {
-    public var width: CGFloat {
+
+
+
+public extension BezelSize {
+    
+    private var width: CGFloat {
         switch self {
         case .normal:
             return 200
         }
     }
     
-    public var height: CGFloat {
+    
+    private var height: CGFloat {
         switch self {
         case .normal:
             return 200
         }
     }
     
-    public var cgSize: CGSize {
-        return CGSize(width: width, height: height)
+    
+    var cgSize: CGSize {
+        CGSize(width: width, height: height)
     }
 }
 

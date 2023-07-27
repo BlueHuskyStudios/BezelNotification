@@ -10,13 +10,13 @@ import AppKit
 
 
 
-public extension NSFont {
-    public static var systemFont: NSFont {
+internal extension NSFont {
+     static var systemFont: NSFont {
         return systemFont(ofSize: systemFontSize)
     }
     
     
-    public static func systemFont(forControlSize controlSize: NSControl.ControlSize) -> NSFont {
+     static func systemFont(forControlSize controlSize: NSControl.ControlSize) -> NSFont {
         return systemFont(ofSize: systemFontSize(for: controlSize))
     }
 }
