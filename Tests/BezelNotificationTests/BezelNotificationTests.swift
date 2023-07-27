@@ -7,7 +7,7 @@
 //
 
 import XCTest
-@testable import BHBezelNotification
+@testable import BezelNotification
 
 class BezelNotificationTests: XCTestCase {
     

@@ -32,6 +32,6 @@ internal extension Array where Element : AnyObject {
     /// - Parameter element: The object whose index to find
     /// - Returns: The index of the first instance of `element`, or `nil` if it's not in this array
     func index(of element: Element) -> Int? {
-        return index(where: { $0 === element })
+        return firstIndex(where: { $0 === element })
     }
 }
