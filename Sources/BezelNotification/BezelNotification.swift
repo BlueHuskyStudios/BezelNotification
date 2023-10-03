@@ -365,7 +365,7 @@ public class BHBezelWindow : NSWindow {
         let visualEffectView = NSVisualEffectView()
         visualEffectView.wantsLayer = true
         visualEffectView.blendingMode = .behindWindow
-        visualEffectView.material = .dark
+        visualEffectView.material = .hudWindow
         visualEffectView.state = .active
         visualEffectView.maskImage = .roundedRectMask(size: self.parameters.size.cgSize,
                                                       cornerRadius: self.parameters.cornerRadius)
