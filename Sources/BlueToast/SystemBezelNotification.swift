@@ -1,11 +1,21 @@
 //
-//  BHBezelNotification.swift
+//  SystemBezelNotification.swift
 //  Bezel Notification
 //
 //  Created by Ky Leggiero on 2017-11-09.
 //  Version 2 created by Ky Leggiero on 2022-02-12.
 //  Copyright © 2022 Ky Leggiero BH-1-PS
 //
+
+#if !canImport(AppKit)
+@available(*, unavailable, message: """
+    `SystemBezelNotification` is only available on macOS because of how it escapes the app window.
+    
+    If you want a similar effect within your SwiftUI app, try using a toast with `.toastStyle(.bezel)` instead.
+    """)
+public typealias SystemBezelToastStyle = BezelToastStyle
+
+#else
 
 import Cocoa
 import Combine
@@ -19,21 +29,53 @@ import FunctionTools
 private let bezelStyleMask: NSWindow.StyleMask = [.borderless]
 
 /// All currently-showing bezel windows
-private var bezelWindows = Set<BezelNotification.Window>()
+private var bezelWindows = Set<SystemBezelNotification.Window>()
+
+
+
+@available(*, deprecated, renamed: "SystemBezelNotification", message: """
+    This was renamed to `SystemBezelNotification` in version 3 of this package.
+    
+    You may continue using it as you had been in previous versions, but consider using the new name instead.
+    
+    Direct usage of this API is no longer encouraged, but still actively supported.
+    You're encouraged to use the new SwiftUI interface, detailed in the current readme.
+    Documentation of previous behavior can be found in-code as documentation for `SystemBezelNotification`, and also in the old Git repo:
+    https://github.com/BlueHuskyStudios/BezelNotification/blob/50c75204c5ca60c25bc5b6ac747cd9cf06e88046/README.md
+    
+    Use the new name to silence this warning.
+    """)
+public typealias BHBezelNotification = SystemBezelNotification
+
+
+
+@available(*, deprecated, renamed: "SystemBezelNotification", message: """
+    This was renamed to `SystemBezelNotification` in version 3 of this package.
+    
+    You may continue using it as you had been in previous versions, but consider using the new name instead.
+    
+    Direct usage of this API is no longer encouraged, but still actively supported.
+    You're encouraged to use the new SwiftUI interface, detailed in the current readme.
+    Documentation of previous behavior can be found in-code as documentation for `SystemBezelNotification`, and also in the old Git repo:
+    https://github.com/BlueHuskyStudios/BezelNotification/blob/50c75204c5ca60c25bc5b6ac747cd9cf06e88046/README.md
+    
+    Use the new name to silence this warning.
+    """)
+public typealias BezelNotification = SystemBezelNotification
 
 
 
 /// The public interface for showing a notification bezel
-public enum BezelNotification {
+public enum SystemBezelNotification {
     // Empty on-purpose; all members are static
 }
 
 
 
-public extension BezelNotification {
+public extension SystemBezelNotification {
     
     /// Shows a BHBezel notification using the given parameters.
-    /// See ``BezelNotification.Parameters`` for documentation of each parameter.
+    /// See ``SystemBezelNotification.Parameters`` for documentation of each parameter.
     ///
     /// If you want to manually dismiss the notification, rather than trusting the time to live, you can give `.forever` for `timeToLive` and cancel or deallocate the resulting publisher when you're ready to dismiss it.
     ///
@@ -41,7 +83,7 @@ public extension BezelNotification {
     ///            **You must retain this in order for the notification to show!**
     ///            To hide the notification manually, simply cancel or deallocate it.
     ///
-    /// - SeeAlso: ``BezelNotification.Parameters``
+    /// - SeeAlso: ``SystemBezelNotification.Parameters``
     @discardableResult
     static func show(messageText: String,
                      icon: NativeImage? = nil,
@@ -80,7 +122,7 @@ public extension BezelNotification {
     
     
     /// Shows a Bezel Notification using the given parameters.
-    /// See ``BezelNotification.Parameters`` for documentation of each parameter.
+    /// See ``SystemBezelNotification.Parameters`` for documentation of each parameter.
     ///
     /// If you want to manually dismiss the notification, rather than trusting the time to live, you can give `.forever` for `timeToLive` and cancel or deallocate the resulting publisher when you're ready to dismiss it.
     ///
@@ -88,7 +130,7 @@ public extension BezelNotification {
     ///            **You must retain this in order for the notification to show!**
     ///            To hide the notification manually, simply cancel or deallocate it.
     ///
-    /// - SeeAlso: ``BezelNotification.Parameters``
+    /// - SeeAlso: ``SystemBezelNotification.Parameters``
     static func show(with parameters: Parameters)
     -> LifecyclePublisher
     {
@@ -136,13 +178,13 @@ public extension BezelNotification {
 
 
 
-public extension BezelNotification {
+public extension SystemBezelNotification {
     typealias LifecyclePublisher = AnyPublisher<LifecycleStage, Never>
 }
 
 
 
-public extension BezelNotification {
+public extension SystemBezelNotification {
     
     /// A stage in the lifecycle of a bezel notification
     enum LifecycleStage {
@@ -169,7 +211,7 @@ public extension BezelNotification {
 
 
 /// A set of parameters used to configure and present a bezel notification
-public extension BezelNotification {
+public extension SystemBezelNotification {
     struct Parameters {
         
         public static let defaultLocation: Location = .normal
@@ -190,49 +232,49 @@ public extension BezelNotification {
         // MARK: Basics
         
         /// The text to show in the bezel notification's message area
-        let messageText: String
+        var messageText: String
         
         /// The icon to show in the bezel notification's icon area
-        let icon: NSImage?
+        var icon: NSImage?
         
         
         // MARK: Presentation
         
         /// The location on the screen at which to display the bezel notification
-        let location: Location
+        var location: Location
         
         /// The size of the bezel notification
-        let size: Size
+        var size: Size
         
         /// The number of seconds to display the bezel notification on the screen
-        let timeToLive: TimeToLive
+        var timeToLive: TimeToLive
         
         
         // MARK: Animations
         
         /// The number of seconds that it takes to fade in the bezel notification
-        let fadeInAnimationDuration: TimeInterval
+        var fadeInAnimationDuration: TimeInterval
         
         /// The number of seconds that it takes to fade out the bezel notification
-        let fadeOutAnimationDuration: TimeInterval
+        var fadeOutAnimationDuration: TimeInterval
         
         
         // MARK: Drawing
         
         /// The radius of the bezel notification's corners, in points
-        let cornerRadius: CGFloat
+        var cornerRadius: CGFloat
         
         /// The tint of the bezel notification's background
-        let backgroundTint: NSColor
+        var backgroundTint: NSColor
         
         /// The distance from the bottom of the bezel notification's bottom at which the baseline of the message label sits
-        let messageLabelBaselineOffsetFromBottomOfBezel: CGFloat
+        var messageLabelBaselineOffsetFromBottomOfBezel: CGFloat
         
         /// The font used for the message label
-        let messageLabelFont: NSFont
+        var messageLabelFont: NSFont
         
         /// The text color of the message label
-        let messageLabelColor: NSColor
+        var messageLabelColor: NSColor
         
         
         public init(messageText: String,
@@ -337,7 +379,7 @@ public extension BezelNotification {
             self.isReleasedWhenClosed = false
             self.level = .screenSaver
             self.ignoresMouseEvents = true
-            self.appearance = NSAppearance(named: .vibrantDark)
+            self.appearance = NSAppearance(named: .vibrantCurrent)
             self.isOpaque = false
             self.backgroundColor = .clear
             self.tabbingMode = .disallowed
@@ -461,7 +503,7 @@ private extension String {
 
 
 
-public extension BezelNotification {
+public extension SystemBezelNotification {
     /// The semantic size of a bezel notification
     enum Size {
         case normal
@@ -470,7 +512,7 @@ public extension BezelNotification {
 
 
 
-internal extension BezelNotification.Size {
+internal extension SystemBezelNotification.Size {
     
     private var width: CGFloat {
         switch self {
@@ -495,7 +537,7 @@ internal extension BezelNotification.Size {
 
 
 
-public extension BezelNotification {
+public extension SystemBezelNotification {
     /// The semantic location of a bezel notification
     enum Location {
         case normal
@@ -504,8 +546,8 @@ public extension BezelNotification {
 
 
 
-internal extension BezelNotification.Location {
-    func bezelWindowContentRect(atSize size: BezelNotification.Size) -> NSRect {
+internal extension SystemBezelNotification.Location {
+    func bezelWindowContentRect(atSize size: SystemBezelNotification.Size) -> NSRect {
         switch self {
         case .normal:
             return screen?.lowerCenterRect(ofSize: size.cgSize) ?? NSRect(origin: NSPoint(x: 48, y: 48), size: size.cgSize)
@@ -533,3 +575,5 @@ private extension NSScreen {
                       size: size)
     }
 }
+
+#endif

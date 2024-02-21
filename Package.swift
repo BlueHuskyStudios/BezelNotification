@@ -4,17 +4,17 @@
 import PackageDescription
 
 let package = Package(
-    name: "BezelNotification",
+    name: "BlueToast",
     
     platforms: [
-        .macOS(.v10_15),
+        .macOS("12"),
+        .iOS("15"),
     ],
     
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "BezelNotification",
-            targets: ["BezelNotification"]),
+            name: "BlueToast",
+            targets: ["BlueToast"]),
     ],
     dependencies: [
         .package(name: "CrossKitTypes", url: "https://github.com/RougeWare/Swift-Cross-Kit-Types.git", from: "1.0.0"),
@@ -24,7 +24,7 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "BezelNotification",
+            name: "BlueToast",
             dependencies: [
                 "CrossKitTypes",
                 "FunctionTools",
@@ -32,6 +32,6 @@ let package = Package(
         
         .testTarget(
             name: "BezelNotificationTests",
-            dependencies: ["BezelNotification"]),
+            dependencies: ["BlueToast"]),
     ]
 )
