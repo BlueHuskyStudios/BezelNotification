@@ -7,8 +7,9 @@ let package = Package(
     name: "BlueToast",
     
     platforms: [
-        .macOS("12"),
-        .iOS("15"),
+//        .macOS("12"),
+//        .iOS("15"),
+        .macOS("14")
     ],
     
     products: [

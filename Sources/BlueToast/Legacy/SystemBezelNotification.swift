@@ -17,8 +17,9 @@ public typealias SystemBezelToastStyle = BezelToastStyle
 
 #else
 
-import Cocoa
+import AppKit
 import Combine
+import Foundation
 
 import CrossKitTypes
 import FunctionTools
