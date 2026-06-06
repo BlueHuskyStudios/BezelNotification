@@ -240,7 +240,11 @@ public extension BezelNotificationParameters {
             #if canImport(AppKit)
                 rawBackgroundTintAlpha = rawBackgroundTint.alphaComponent
             #else
-                rawBackgroundTint.getRed(nil, green: nil, blue: nil, alpha: &rawBackgroundTintAlpha)
+                var alpha: CGFloat = 0
+                if !rawBackgroundTint.getRed(nil, green: nil, blue: nil, alpha: &alpha) {
+                    alpha = rawBackgroundTint.alphaComponent
+                }
+                rawBackgroundTintAlpha = alpha
             #endif
             
             return rawBackgroundTint.withAlphaComponent(rawBackgroundTintAlpha * 0.15)
